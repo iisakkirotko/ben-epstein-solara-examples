@@ -56,28 +56,32 @@ def TokenViewer():
         print(type(e))
         sl.Error(f"Failed to create tokens and tags: {str(e)}")
 
+
 @sl.component
 def SpanJson():
     print(f"\n\n{spans.value}\n\n")
     spans_json = try_json(spans.value, show_warn=False)
     show_spans = json.dumps(spans_json, indent=4) if spans_json else spans.value
-    sl.Markdown(
-        f"```json\n{show_spans}\n```"
-    )
+    sl.Markdown(f"```json\n{show_spans}\n```", style={"padding": "0"})
+
 
 @sl.component
 def Options():
     sl.Markdown("## Enter your data")
     sl.Select("Pick your tokenizer", TOKENIZERS, tokenizer)
-    sl.MarkdownEditor(value=f"```json\n{spans.value}\n```", on_value=lambda spans_str: spans.set(spans_str.lstrip("```json\n").rstrip("\n```")))
+    sl.MarkdownEditor(
+        value=f"```json\n{spans.value}\n```",
+        on_value=lambda spans_str: spans.set(
+            spans_str.lstrip("```json\n").rstrip("\n```")
+        ),
+    )
     sl.Button("Convert to tokens", on_click=lambda: spans_checkpoint.set(spans.value))
     SpanJson()
+
 
 @sl.component
 def Page():
     with sl.Columns([1, 1]):
         Options()
         TokenViewer()
-
-    
-
+    sl.Style(".solara-markdown{max-width: unset;}")
